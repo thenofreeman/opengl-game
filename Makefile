@@ -1,8 +1,8 @@
-LIB_NAME = freeze
+LIB_NAME = Freeze
 
 LIB_DIR = ../Freeze
 LIB_SRC_DIR = $(LIB_DIR)/src
-LIB_INCLUDE_DIR = $(LIB_DIR)/include
+LIB_INCLUDE_DIR = $(LIB_DIR)/include/$(LIB_NAME)
 LIB_BUILD_DIR = $(LIB_DIR)/build
 
 LIB_SRCS = $(wildcard $(LIB_SRC_DIR)/*.cpp)
@@ -24,7 +24,8 @@ AR = ar
 
 WARN_FLAGS = -Wall -Wextra
 CXXSTD = -std=c++17
-CXXFLAGS = $(WARN_FLAGS) $(CXXSTD) -I$(INCLUDE_DIR) -I$(LIB_INCLUDE_DIR)
+GRAPHICS_FLAGS = -lGL -lGLU -lglut -lGLEW -lglfw -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor 
+CXXFLAGS = $(WARN_FLAGS) $(CXXSTD) $(GRAPHICS_FLAGS) -I$(INCLUDE_DIR) -I$(LIB_INCLUDE_DIR)
 
 TARGET = $(BUILD_DIR)/$(OUTPUT)
 
