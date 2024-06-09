@@ -1,18 +1,16 @@
-LIB_NAME = Freeze
-
-LIB_DIR = ../Freeze
-LIB_SRC_DIR = $(LIB_DIR)/src
-LIB_INCLUDE_DIR = $(LIB_DIR)/include/$(LIB_NAME)
-LIB_BUILD_DIR = $(LIB_DIR)/build
-
-LIB_SRCS = $(wildcard $(LIB_SRC_DIR)/*.cpp)
-LIB_OBJS = $(patsubst $(LIB_SRC_DIR)/%.cpp, $(LIB_BUILD_DIR)/%.o, $(LIB_SRCS))
-
-LIB_STATIC = $(LIB_BUILD_DIR)/lib$(LIB_NAME).a
-
 SRC_DIR = src
 INCLUDE_DIR = include
 BUILD_DIR = build
+LIB_DIR = lib
+
+# Paths to the Freeze project
+FREEZE_DIR = ../Freeze
+FREEZE_INCLUDE_DIR = $(FREEZE_DIR)/include
+FREEZE_LIB_DIR = $(FREEZE_DIR)/build
+
+# Paths to glad and GLFW (these should match those in the Freeze Makefile)
+GLAD_INCLUDE_DIR = $(FREEZE_DIR)/lib/glad/include
+GLFW_INCLUDE_DIR = $(FREEZE_DIR)/lib/glfw/include
 
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
@@ -20,12 +18,15 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
 OUTPUT = game
 
 CXX = g++
-AR = ar
 
 WARN_FLAGS = -Wall -Wextra
 CXXSTD = -std=c++17
-GRAPHICS_FLAGS = -lGL -lGLU -lglut -lGLEW -lglfw -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor 
-CXXFLAGS = $(WARN_FLAGS) $(CXXSTD) $(GRAPHICS_FLAGS) -I$(INCLUDE_DIR) -I$(LIB_INCLUDE_DIR)
+
+# Add Freeze, glad, and GLFW include paths
+CXXFLAGS = $(WARN_FLAGS) $(CXXSTD) -I$(INCLUDE_DIR) -I$(FREEZE_INCLUDE_DIR) -I$(GLAD_INCLUDE_DIR) -I$(GLFW_INCLUDE_DIR)
+
+# Ensure that the linker knows where to find libFreeze.a and required system libraries
+LDFLAGS = -L$(FREEZE_LIB_DIR) -lFreeze -lGL -lglfw -ldl
 
 TARGET = $(BUILD_DIR)/$(OUTPUT)
 
@@ -33,23 +34,14 @@ TARGET = $(BUILD_DIR)/$(OUTPUT)
 
 all: $(TARGET)
 
-$(LIB_STATIC): $(LIB_OBJS) | $(LIB_BUILD_DIR)
-	$(AR) rcs $@ $^
-
-$(LIB_BUILD_DIR)/%.o: $(LIB_SRC_DIR)/%.cpp | $(LIB_BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(LIB_BUILD_DIR):
-	mkdir -p $@
-
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR):
 	mkdir -p $@
 
-$(TARGET): $(OBJS) $(LIB_STATIC)
-	$(CXX) -g -o $@ $(OBJS) -L$(LIB_BUILD_DIR) -l$(LIB_NAME)
+$(TARGET): $(OBJS)
+	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
-	rm -rf $(BUILD_DIR) $(LIB_BUILD_DIR)
+	rm -rf $(BUILD_DIR) $(LIB_DIR)
