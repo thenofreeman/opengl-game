@@ -1,30 +1,26 @@
 #include <iostream>
 
-#include "Freeze.h"
+#include "Freeze/Freeze.h"
+#include "Freeze/Triangle.h"
 
 int main()
 {
-    ns::Matrix<int, 3, 3> A = { 
-        { 1, 2, 3 },
-        { 4, 5, 6 },
-        { 7, 8, 9 }
-    };
-    std::cout << A << std::endl << std::endl;
+    ns::Window window ("Adventure Game", { 640, 480 });
+    window.initialize();
 
-    ns::Matrix<int, 3, 3> B = A + 5;
-    std::cout << B << std::endl;
+    window.setAspectRatio({ 16, 9 });
 
-    // Window window ("Adventure Game", { 640, 480 });
-    // window.initialize();
+    ns::Triangle tri;
 
-    // window.setAspectRatio({ 16, 9 });
+    while (window.isOpen())
+    {
+        window.processInput();
+        window.update();
 
-    // while (window.update())
-    // {
+        tri.draw();
+    }
 
-    // }
-
-    // window.shutdown();
+    window.shutdown();
 
     return 0;
 }
